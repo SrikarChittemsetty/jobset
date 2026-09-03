@@ -89,6 +89,9 @@ func (p *podWebhook) Default(ctx context.Context, pod *corev1.Pod) error {
 // The value is only ever compared for equality, never parsed back into a number.
 func priorityLabelValue(priority int32) string {
 	if priority < 0 {
+		// Negated as int64 because -int32(math.MinInt32) overflows and wraps back to
+		// MinInt32, which would render as "n-2147483648" and carry a sign the "n"
+		// prefix is there to replace.
 		return fmt.Sprintf("n%d", -int64(priority))
 	}
 	return fmt.Sprint(priority)
